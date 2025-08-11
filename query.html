@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信息查询系统 - 移动端</title>
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7f1 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            padding: 25px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #1a2980;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+        }
+        
+        .search-box {
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a2980;
+            font-weight: bold;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #26d0ce;
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.2);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(26, 41, 128, 0.3);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #162370 0%, #22c0be 100%);
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
+        }
+        
+        .result-card h3 {
+            color: #1a2980;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.3em;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: #555;
+            flex: 1;
+        }
+        
+        .result-value {
+            color: #1a2980;
+            font-weight: bold;
+            flex: 1.5;
+            text-align: right;
+            word-break: break-word;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+            margin-top: 20px;
+        }
+        
+        .no-results h3 {
+            color: #dc3545;
+            margin-bottom: 12px;
+            font-size: 1.3em;
+        }
+        
+        .no-results p {
+            color: #666;
+        }
+        
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1a2980;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>信息查询系统</h1>
+            <p>移动端信息查询解决方案</p>
+        </div>
+        
+        <div class="search-box">
+            <div class="form-group">
+                <label for="mobileSearch">姓名或身份证后6位</label>
+                <input type="text" id="mobileSearch" placeholder="请输入姓名或身份证后6位">
+            </div>
+            <button class="btn" id="mobileSearchBtn">
+                <i class="fas fa-search"></i> 查询信息
+            </button>
+        </div>
+        
+        <div id="mobileResult">
+            <div class="status warning">
+                请在上方输入查询条件并点击查询按钮
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 移动端搜索功能
+        document.getElementById('mobileSearchBtn').addEventListener('click', function() {
+            const searchValue = document.getElementById('mobileSearch').value.trim();
+            const resultContainer = document.getElementById('mobileResult');
+            
+            if (!searchValue) {
+                resultContainer.innerHTML = `
+                    <div class="status error">
+                        请输入查询条件
+                    </div>
+                `;
+                return;
+            }
+            
+            // 显示加载状态
+            resultContainer.innerHTML = `
+                <div class="status warning">
+                    <div class="loading"></div> 正在查询中，请稍候...
+                </div>
+            `;
+            
+            // 从localStorage获取数据
+            const headers = JSON.parse(localStorage.getItem('excelHeaders')) || [];
+            const excelData = JSON.parse(localStorage.getItem('excelData')) || [];
+            
+            if (excelData.length === 0) {
+                resultContainer.innerHTML = `
+                    <div class="status error">
+                        未找到数据，请先在PC端上传Excel文件
+                    </div>
+                `;
+                return;
+            }
+            
+            // 查找匹配的数据
+            const results = [];
+            
+            // 获取姓名和身份证字段索引
+            const nameIndex = headers.findIndex(h => 
+                h && (h.includes('姓名') || h.includes('name')));
+            const idIndex = headers.findIndex(h => 
+                h && (h.includes('身份证') || h.includes('id') || h.includes('ID')));
+            
+            // 遍历所有数据行
+            for (let i = 0; i < excelData.length; i++) {
+                const row = excelData[i];
+                let match = false;
+                
+                // 姓名匹配
+                if (nameIndex !== -1 && row[nameIndex]) {
+                    const nameValue = row[nameIndex].toString().toLowerCase();
+                    if (nameValue.includes(searchValue.toLowerCase())) {
+                        match = true;
+                    }
+                }
+                
+                // 身份证后6位匹配
+                if (!match && idIndex !== -1 && row[idIndex]) {
+                    const idValue = row[idIndex].toString().trim();
+                    // 获取身份证后6位
+                    const idLast6 = idValue.slice(-6);
+                    if (idLast6 === searchValue) {
+                        match = true;
+                    }
+                }
+                
+                if (match) {
+                    const result = {};
+                    headers.forEach((header, index) => {
+                        // 跳过身份证字段
+                        if (header && index !== idIndex && row[index] !== undefined) {
+                            result[header] = row[index];
+                        }
+                    });
+                    results.push(result);
+                }
+            }
+            
+            // 显示结果
+            displayMobileResults(results);
+        });
+        
+        function displayMobileResults(results) {
+            const resultContainer = document.getElementById('mobileResult');
+            
+            if (results.length === 0) {
+                resultContainer.innerHTML = `
+                    <div class="no-results">
+                        <h3>未找到匹配的信息</h3>
+                        <p>请检查输入的查询条件是否正确</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let resultHTML = '';
+            
+            results.forEach((result, index) => {
+                resultHTML += `
+                    <div class="result-card">
+                        <h3>查询结果 ${index + 1}</h3>
+                `;
+                
+                Object.entries(result).forEach(([key, value]) => {
+                    // 处理空值
+                    const displayValue = value === null || value === undefined ? '无' : value;
+                    resultHTML += `
+                        <div class="result-row">
+                            <span class="result-label">${key}:</span>
+                            <span class="result-value">${displayValue}</span>
+                        </div>
+                    `;
+                });
+                
+                resultHTML += `</div>`;
+            });
+            
+            resultContainer.innerHTML = resultHTML;
+        }
+    </script>
+</body>
+</html>
